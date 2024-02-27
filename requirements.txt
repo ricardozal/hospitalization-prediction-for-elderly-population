@@ -8,4 +8,4 @@ pytest==7.2.1
 scikit-learn==1.2.1
 seaborn==0.12.2
 lightgbm==4.1.0
-sas7bdat
+sas7bdat==2.2.3

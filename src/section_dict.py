@@ -554,7 +554,7 @@ section_G = {
     'Any Child with Respondent' : Family12,
     'Any Children Same City' : Family13,
     'Any Weekly Contact with Children' : Family14,
-    'Frequent  Contact with Relatives' : Family15,
+    'Frequent Contact with Relatives' : Family15,
     'Weekly Social Activities' : Family16,
     'Financial Transfer from Children' : Family17,
     'Financial Transfer to Children' : Family18,
