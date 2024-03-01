@@ -18,3 +18,7 @@ DATASET_MEX_COG = str(
 DATASET_MEX_COG_URL = (
     "https://drive.google.com/uc?id=1MnDC30Jo5Jztmb99z5PLJQA47vj-iDdA&confirm=t"
 )
+DATASET_TRAIN = str(Path(DATASET_ROOT_PATH) / "application_train_aai.csv")
+DATASET_TRAIN_URL = (
+    "https://drive.google.com/uc?id=1C9tUEZ2kxlo-hbTWneDMnEvhd5HhP8Ke&confirm=t"
+)
