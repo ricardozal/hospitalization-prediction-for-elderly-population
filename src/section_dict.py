@@ -210,7 +210,7 @@ Incom8 = ['r1iothr', 'r2iothr', 'r3iothr', 'r4iothr', 'r5iothr', 's1iothr', 's2i
 # Total Household Income (respondent & spouse)
 Incom9 = ['h1itot', 'h2itot', 'h3itot', 'h4itot', 'h5itot', 'h1iftot', 'h2iftot', 'h3iftot', 'h4iftot', 'h5iftot']
 # Total Household Consumption (full household)
-Incom10 = ['hh1ctot1m', 'hh2ctot1m', 'hh3ctot1m', 'hh4ctot1m', 'hh5ctot1m', 'hh1cftot1m', 'hh2cftot1m', 'hh3cftot1m', 'hh4cftot1m', 'hh5cftot1m']
+Incom10 = ['h1ctot1m', 'h2ctot1m', 'h3ctot1m', 'h4ctot1m', 'h5ctot1m', 'h1cftot1m', 'h2cftot1m', 'h3cftot1m', 'h4cftot1m', 'h5cftot1m']
 
 # SECTION G: FAMILY STRUCTURE (223 features)
 # Number of People Living in Household

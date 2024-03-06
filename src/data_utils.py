@@ -73,6 +73,12 @@ def outline_dataframe(app_all: pd.DataFrame, elimins: List[list]) -> pd.DataFram
     
     working_app_all = app_all.copy()
 
+    # Define old and new column names
+    old_dfnames = ['hh1ctot1m', 'hh1cftot1m', 'hh2cftot1m', 'hh2ctot1m', 'hh3cftot1m', 'hh3ctot1m', 'hh4cftot1m', 'hh4ctot1m', 'hh5cftot1m', 'hh5ctot1m']
+    new_dfnames = ['h1ctot1m', 'h1cftot1m', 'h2cftot1m', 'h2ctot1m', 'h3cftot1m', 'h3ctot1m', 'h4cftot1m', 'h4ctot1m', 'h5cftot1m', 'h5ctot1m']
+    # Rename columns
+    working_app_all.rename(columns=dict(zip(old_dfnames, new_dfnames)), inplace=True)
+
     waves_col = filter_dataset(sections, elimins)
 
     waves = []

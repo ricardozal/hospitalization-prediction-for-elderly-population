@@ -50,9 +50,22 @@ def elim_bycorr(app_train : pd.DataFrame, corr_threshold : float) -> pd.DataFram
     df_dropped = df.drop(all_to_drop.tolist(), axis=1)
     return df_dropped
 
-def remove_highly_correlated(df : pd.DataFrame, target : str, threshold : float):
-    correlations = df.corr()[target].abs() # calculating correlation
-    to_drop = [column for column in df.columns if column != target and correlations[column] >= threshold]
-    df_dropped = df.drop(to_drop, axis=1)
-    return df_dropped
+def remove_highly_correlated(df: pd.DataFrame, target: str, threshold: float):
+    # Make a copy of df
+    temp_df = df.copy()
 
+    # Check if target is datetime, if so, convert it to numeric timestamps
+    if temp_df[target].dtypes.kind == 'M':
+        temp_df[target] = temp_df[target].values.astype(float)
+
+    # Calculate correlations
+    correlations = temp_df.corr(numeric_only=True)[target].abs()
+
+    # Identify columns to drop (those with correlation to target greater than threshold)
+    to_drop = [column for column in temp_df.columns
+               if column != target and column in correlations and correlations[column] >= threshold]
+
+    # Drop highly correlated columns
+    df_dropped = df.drop(to_drop, axis=1)
+
+    return df_dropped
