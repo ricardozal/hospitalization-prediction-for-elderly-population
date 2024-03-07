@@ -2,3 +2,5 @@ dataset/
 testenv/
 src/__pycache__/
 src/__init__.py
+helth-project/
+.idea/
