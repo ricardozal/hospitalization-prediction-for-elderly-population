@@ -1,11 +1,11 @@
 import os
 from typing import List, Tuple
-from sas7bdat import SAS7BDAT
 from collections import OrderedDict
 
 import gdown
 import pandas as pd
 import numpy as np
+from pandas.io.sas.sasreader import ReaderBase
 
 from src import config
 from src.section_dict import (
@@ -50,8 +50,8 @@ def get_datasets() -> pd.DataFrame:
         gdown.download(config.DATASET_MEX_COG_URL, config.DATASET_MEX_COG, quiet=False)
 
     # read the dataset H_MHAS_c2 from the file (470 MB)
-    with SAS7BDAT('./dataset/H_MHAS_c2.sas7bdat') as file:
-        h_mas_c2 = file.to_data_frame()
+    file_path = './dataset/H_MHAS_c2.sas7bdat'
+    h_mas_c2 = pd.read_sas(file_path)
 
     return h_mas_c2
 
