@@ -180,6 +180,7 @@ def preprocess_dataframe(df : pd.DataFrame) -> pd.DataFrame:
 
     # Convert columns to categorical type based on the dictionaries
     for col, mapping in categories.items():
-        df[col] = df[col].map(mapping).astype('category')
+        if col in df.columns:
+            df[col] = df[col].map(mapping).astype('category')
 
     return df

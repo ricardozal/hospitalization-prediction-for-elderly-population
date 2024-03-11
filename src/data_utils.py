@@ -1,11 +1,9 @@
 import os
 from typing import List, Tuple
-from collections import OrderedDict
 
 import gdown
 import pandas as pd
 import numpy as np
-from pandas.io.sas.sasreader import ReaderBase
 
 from src import config
 from src.section_dict import (
@@ -26,14 +24,15 @@ from src.section_dict import (
     section_Q  # Q: PSYCHOSOCIAL
 )
 
-def get_datasets() -> pd.DataFrame:
-    """
-    Download from GDrive all the needed datasets for the project.
 
-    Returns:
-        h_mas_c2 : pd.DataFrame
-            Raw file with information from interviews with elderly people. 
-            
+def get_datasets(
+        chunksize: int = 10000
+) -> pd.DataFrame:
+    """
+    Downloads and loads SAS dataset from GDrive.
+
+    :param chunksize: Dataset chunk size (avoids memory overload).
+    :return: Raw dataframe with information of elderly people interviews.
     """
     # Download H_MHAS_c2.sas7bdat
     if not os.path.exists(config.DATASET_MHAS_C2):
@@ -41,32 +40,51 @@ def get_datasets() -> pd.DataFrame:
             config.DATASET_MHAS_URL, config.DATASET_MHAS_C2, quiet=False
         )
 
-    # Download H_MHAS_EOL_b.sas7bdat
-    if not os.path.exists(config.DATASET_MHAS_EOL):
-        gdown.download(config.DATASET_MHAS_EOL_URL, config.DATASET_MHAS_EOL, quiet=False)
-
-    # Download H_MEX_COG_A2_2016.dta
-    if not os.path.exists(config.DATASET_MEX_COG):
-        gdown.download(config.DATASET_MEX_COG_URL, config.DATASET_MEX_COG, quiet=False)
-
     # read the dataset H_MHAS_c2 from the file (470 MB)
-    file_path = './dataset/H_MHAS_c2.sas7bdat'
-    h_mas_c2 = pd.read_sas(file_path)
+    file_path = os.path.join(config.DATASET_ROOT_PATH, config.DATASET_MHAS_C2)
+
+    list_of_dataframes = [
+        df for df in pd.read_sas(file_path, chunksize=chunksize)
+    ]
+
+    h_mas_c2 = pd.concat(list_of_dataframes)
 
     return h_mas_c2
 
 
-def get_datatrain() -> pd.DataFrame:
-    
+def get_datatrain(
+        chunksize: int = 10000
+) -> pd.DataFrame:
+    """
+    Gets preliminary unified spouse dataset.
+
+    :param chunksize: Dataset chunk size (avoids memory overload).
+    :return: Raw unified spouse dataframe.
+    """
     # Download application_train_aai.csv
     if not os.path.exists(config.DATASET_TRAIN):
         gdown.download(config.DATASET_TRAIN_URL, config.DATASET_TRAIN, quiet=False)
         
-    app_train = pd.read_csv(config.DATASET_TRAIN)
+    list_of_dataframes = [
+        df for df in pd.read_csv(config.DATASET_TRAIN, chunksize=chunksize)
+    ]
+
+    app_train = pd.concat(list_of_dataframes)
     
     return app_train
 
-def outline_dataframe(app_all: pd.DataFrame, elimins: List[list]) -> pd.DataFrame:
+
+def outline_dataframe(
+        app_all: pd.DataFrame,
+        elimins: List[list]
+) -> pd.DataFrame:
+    """
+    Constructs dataframe with the most relevant dataset features.
+
+    :param app_all: Raw dataset dataframe with all features.
+    :param elimins: List of irrelevant features.
+    :return: Dataframe with relevant features.
+    """
     sections = [section_A, section_B, section_C, section_D, section_E, section_F,
                 section_G, section_H, section_I, section_J, section_K, section_L,
                 section_M, section_O, section_Q]
@@ -74,53 +92,79 @@ def outline_dataframe(app_all: pd.DataFrame, elimins: List[list]) -> pd.DataFram
     working_app_all = app_all.copy()
 
     # Define old and new column names
-    old_dfnames = ['hh1ctot1m', 'hh1cftot1m', 'hh2cftot1m', 'hh2ctot1m', 'hh3cftot1m', 'hh3ctot1m', 'hh4cftot1m', 'hh4ctot1m', 'hh5cftot1m', 'hh5ctot1m']
-    new_dfnames = ['h1ctot1m', 'h1cftot1m', 'h2cftot1m', 'h2ctot1m', 'h3cftot1m', 'h3ctot1m', 'h4cftot1m', 'h4ctot1m', 'h5cftot1m', 'h5ctot1m']
+    old_dfnames = ['hh1ctot1m', 'hh1cftot1m', 'hh2cftot1m', 'hh2ctot1m', 'hh3cftot1m',
+                   'hh3ctot1m', 'hh4cftot1m', 'hh4ctot1m', 'hh5cftot1m', 'hh5ctot1m']
+    # 'h1ctot1m', 'h1cftot1m', 'h2cftot1m', 'h2ctot1m', 'h3cftot1m'
+    # 'h3ctot1m', 'h4cftot1m', 'h4ctot1m', 'h5cftot1m', 'h5ctot1m'
+    new_dfnames = [column_name.replace("hh", "h") for column_name in old_dfnames]
+
     # Rename columns
     working_app_all.rename(columns=dict(zip(old_dfnames, new_dfnames)), inplace=True)
 
-    waves_col = filter_dataset(sections, elimins)
+    waves_columns = filter_dataset(sections, elimins)
 
     waves = []
 
-    for i in range(5):  
-        data = {col: working_app_all[col] if col in working_app_all.columns else np.nan for col in waves_col[i]}
-        wave = pd.DataFrame(data)
-        wave.columns = [item[0] + 'X' + item[2:] if item[1].isdigit() else item for item in wave.columns.tolist()]
+    for wave_columns in waves_columns:
+        wave = pd.DataFrame({
+            column: working_app_all[column]
+            if column in working_app_all.columns else np.nan
+            for column in wave_columns
+        })
+        wave.rename(columns={
+            column: column[0] + 'X' + column[2:]
+            for column in wave.columns if column[1].isdigit()
+        }, inplace=True)
         waves.append(wave)
         
     app_all_data = pd.concat(waves)
 
     return app_all_data
 
-def filter_dataset(sections: List[dict], elimins: List[list]) -> Tuple[List[str]]:
-    """
-    Splits the entire column list of the DataFrame into five different interview columns.
 
-    Returns:
-        waves : List[list]
-                  
+def filter_dataset(
+        sections: List[dict],
+        elimins: List[list]
+) -> Tuple[List[str]]:
     """
-    
-    Total_sections = []
+    Splits dataframe columns into five different interview columns.
+
+    :param sections: List of feature sections.
+    :param elimns: List of features to be eliminated.
+    :return: Tuple object of features list divided in waves (interviews cycle).
+    """
+    total_sections = []
 
     # Iterate over each dictionary and its values
     for section, elimin in zip(sections, elimins):
-        filtered_section = {k: v for k, v in section.items() if k not in elimin}
-        # Extend the Total_sections list with the values from the current list
-        for values_list in filtered_section.values():
-            Total_sections.extend(values_list)
+        for key, values_list in section.items():
+            if key not in elimin:
+                # Extend the total_sections list with the values
+                # from the current list
+                total_sections.extend(values_list)
 
-    new_list = [item[0] + 'X' + item[2:] if item[1].isdigit() else item for item in Total_sections]
+    unique_values_array = np.unique([
+        section[0] + "X" + section[2:] if section[1].isdigit() else section
+        for section in total_sections
+    ])
 
-    unique_values_array = np.unique(new_list)
-    # No need to convert to list
-    # Five different lists were created to store the information from the five interviews.
-    waves = [[s.replace('X', str(i)) for s in unique_values_array] for i in range(1, 6)]
+    # Five different lists were created to store the five interviews
+    # cycle information.
+    return (
+        [s.replace('X', str(i)) for s in unique_values_array]
+        for i in range(1, 6)
+    )
 
-    return tuple(waves)
 
-def unify_spousandref(app_train: pd.DataFrame)-> pd.DataFrame:
+def unify_spousandref(
+        app_train: pd.DataFrame
+)-> pd.DataFrame:
+    """
+    Constructs unified dataframe.
+
+    :param app_train: Raw not unified dataset dataframe.
+    :return: Unified dataset dataframe.
+    """
     # Extract all column names from the dataframe into a names_data_app list.
     names_data_app = app_train.columns.tolist()
 
@@ -136,9 +180,11 @@ def unify_spousandref(app_train: pd.DataFrame)-> pd.DataFrame:
     # Check if the column name starts with 's' before replacing the first letter
     app_train_s.columns = [name.replace('s', 'r', 1) if name.startswith('s') else name for name in app_train_s.columns]
 
-    vars_in_s = ['rXbmonth', 'rXbyear', 'rXdmonth', 'rXdyear', 'rXedisced', 'rXeducl', 'rXedyrs', 'rXevbrn', 'rXfeduc_m', 'rXgender', 'rXindlang', 'rXliterate', 'rXmeduc_m', 'rXnumerate']
+    vars_in_s = ['rXbmonth', 'rXbyear', 'rXdmonth', 'rXdyear', 'rXedisced', 'rXeducl',
+                 'rXedyrs', 'rXevbrn', 'rXfeduc_m', 'rXgender', 'rXindlang', 'rXliterate',
+                 'rXmeduc_m', 'rXnumerate']
     # New variable names
-    vars_to_repl = ['rabmonth', 'rabyear', 'radmonth', 'radyear', 'raedisced', 'raeducl', 'raedyrs', 'raevbrn', 'rafeduc_m', 'ragender', 'raindlang', 'raliterate', 'rameduc_m', 'ranumerate']
+    vars_to_repl = [column_name.replace("rX", "ra") for column_name in vars_in_s]
     
     # Create a mapping between the old variable names and the new ones
     variable_mapping = {old_var: new_var for old_var, new_var in zip(vars_in_s, vars_to_repl)}
