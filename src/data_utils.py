@@ -29,14 +29,15 @@ sections = [section_A, section_B, section_C, section_D, section_E, section_F,
             section_G, section_H, section_I, section_J, section_K, section_L,
             section_M, section_O, section_Q]
 
-def get_datasets() -> pd.DataFrame:
-    """
-    Download from GDrive all the needed datasets for the project.
 
-    Returns:
-        h_mas_c2 : pd.DataFrame
-            Raw file with information from interviews with elderly people. 
-            
+def get_datasets(
+        chunksize: int = 10000
+) -> pd.DataFrame:
+    """
+    Downloads and loads SAS dataset from GDrive.
+
+    :param chunksize: Dataset chunk size (avoids memory overload).
+    :return: Raw dataframe with information of elderly people interviews.
     """
     # Download H_MHAS_c2.sas7bdat
     if not os.path.exists(config.DATASET_MHAS_C2):
@@ -45,81 +46,112 @@ def get_datasets() -> pd.DataFrame:
         )
 
     # read the dataset H_MHAS_c2 from the file (470 MB)
-    file_path = './dataset/H_MHAS_c2.sas7bdat'
-    h_mas_c2 = pd.read_sas(file_path)
+    file_path = os.path.join(config.DATASET_ROOT_PATH, config.DATASET_MHAS_C2)
 
-    return h_mas_c2
+    return pd.concat([
+        df for df in pd.read_sas(file_path, chunksize=chunksize)
+    ])
 
 
-def get_datatrain() -> pd.DataFrame:
-    
+def get_datatrain(
+        chunksize: int = 10000
+) -> pd.DataFrame:
+    """
+    Gets preliminary unified spouse dataset.
+
+    :param chunksize: Dataset chunk size (avoids memory overload).
+    :return: Raw unified spouse dataframe.
+    """    
     # Download application_train_aai.csv
     if not os.path.exists(config.DATASET_TRAIN):
         gdown.download(config.DATASET_TRAIN_URL, config.DATASET_TRAIN, quiet=False)
         
-    app_train = pd.read_csv(config.DATASET_TRAIN)
-    
-    return app_train
+    return pd.concat([
+        df for df in pd.read_csv(config.DATASET_TRAIN, chunksize=chunksize)
+    ])
 
 
-def remove_unnecessary_columns(df: pd.DataFrame, subsections_to_remove: List):
+def remove_unnecessary_columns(
+        df: pd.DataFrame,
+        subsections_to_remove: List
+) -> pd.DataFrame:
+    """
+    Removes unnecessary columns.
+
+    :param df: Working dataframe.
+    :param subsections_to_remove: List of subsections to remove.
+    :return: Dataframe without the given subsections.
+    """
     features_to_remove = []
     for section in sections:
         for subsection, features in section.items():
             if subsection in subsections_to_remove:
                 features_to_remove += features
 
-    df = df.drop(columns=features_to_remove)
+    df.drop(columns=features_to_remove, inplace=True)
 
     return df
 
 
-def concat_waves(df: pd.DataFrame):
-    column_names_new = set([re.sub(r'^(r|s|h|hh)\d', '', x) for x in df.columns])
-    print(column_names_new)
-    print(f'TAMAÑO = {len(column_names_new)}')
-    dfs = {key: list() for key in column_names_new}
+def get_new_columns_names(
+    df_columns: pd.core.indexes.range.RangeIndex
+) -> pd.DataFrame:
+    """
+    Get new columns names from dataframe.
 
-    # Dictionary to hold each column as a separate DataFrame
-    column_dfs = {}
-
-    # Split each column into a separate DataFrame
-    for column in df:
-        column_dfs[column] = df[[column]]
-
-    for key, value in column_dfs.items():
-        for col_new in column_names_new:
-            pattern = re.compile(r'\d' + col_new + '$')
-            if bool(pattern.search(key)):
-                print(f'from {value.columns[0]} to {col_new}')
-                value = value.rename(columns={value.columns[0]: col_new})
-                dfs[col_new].append(value)
-            elif key == col_new:
-                print(f'from {value.columns[0]} to {col_new}')
-                dfs[col_new].append(value)
+    :param df: Dataset dataframe.
+    :return: _description_
+    """
+    # New columns names dataframe
+    columns_names_df = pd.DataFrame({
+        "old_column_name": df_columns})
+    columns_names_df["new_column_name"] = \
+        columns_names_df["old_column_name"].apply(
+            lambda old_column_name: re.sub(
+                r"(r|s|h|hh)\d", "", old_column_name))
+    return columns_names_df
 
 
-    for key, value in dfs.items():
-        print(f'{key} was resized to 1 from {len(value)}')
+def fill_ds(
+    ds: pd.Series
+):
+    """
+    Fill concatenated pandas series nan values.
+
+    :param ds: Pandas series.
+    :return: Filled pandas series.
+    """
+    unique_values = ds.loc[pd.notna].unique()
+    fillna_values = np.resize(unique_values, ds.isna().sum())
+    return ds.fillna(pd.Series(fillna_values))
 
 
-    # Adjusted step to concatenate DataFrames within each list and reset index
-    concat_dfs = {key: pd.concat(df_list, ignore_index=True, axis=0) if df_list else pd.DataFrame() for key, df_list in dfs.items()}
+def concat_waves(
+        df: pd.DataFrame
+) -> pd.DataFrame:
+    """
+    Constructs a unified dataframe from dataset dataframe.
 
-    # Merge all concatenated DataFrames side by side
-    final_df = pd.concat(concat_dfs.values(), axis=1)
+    :param df: Not unified dataset dataframe.
+    :return: Unified dataset dataframe.
+    """
+    # New columns names dataframe
+    columns_names = get_new_columns_names(df.columns)
 
-    for col_new in column_names_new:
-        if len(dfs[col_new]) == 1:
-            print(f'{col_new} was filled')
-            unique_values = final_df.loc[final_df[col_new].notna(), col_new].unique()
+    concat_dc: dict = {}
+    # Iterate over each column in the DataFrame
+    grouped_columns_by_names = columns_names.groupby("new_column_name")
+    for new_column_name, old_column_name_list in grouped_columns_by_names:
+        concat_dc[new_column_name] = pd.concat(
+            map(
+                lambda column_name: df[column_name].rename(
+                    new_column_name),
+                old_column_name_list["old_column_name"]
+            ), ignore_index=True, axis=0)
+        if old_column_name_list.shape[0] == 1:
+            concat_dc[new_column_name] = fill_ds(concat_dc[new_column_name])
 
-            # Calculate the number of NaNs to fill
-            nan_count = final_df[col_new].isna().sum()
-
-            sequence_to_fill = np.resize(unique_values, nan_count)
-
-            # Assign this sequence to the NaN positions in each column
-            final_df.loc[final_df[col_new].isna(), col_new] = sequence_to_fill
-
-    return final_df
+    return pd.concat(
+        map(lambda key: concat_dc[key], concat_dc),
+        axis=1
+    )
