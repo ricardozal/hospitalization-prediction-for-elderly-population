@@ -93,65 +93,54 @@ def remove_unnecessary_columns(
     return df
 
 
-def get_new_columns_names(
-    df_columns: pd.core.indexes.range.RangeIndex
-) -> pd.DataFrame:
-    """
-    Get new columns names from dataframe.
-
-    :param df: Dataset dataframe.
-    :return: _description_
-    """
-    # New columns names dataframe
-    columns_names_df = pd.DataFrame({
-        "old_column_name": df_columns})
-    columns_names_df["new_column_name"] = \
-        columns_names_df["old_column_name"].apply(
-            lambda old_column_name: re.sub(
-                r"(r|s|h|hh)\d", "", old_column_name))
-    return columns_names_df
+def extract_column_names(df):
+    """Extract new column names by removing specific prefixes."""
+    return set([re.sub(r'^(r|s|h|hh)\d', '', x) for x in df.columns])
 
 
-def fill_ds(
-    ds: pd.Series
-):
-    """
-    Fill concatenated pandas series nan values.
-
-    :param ds: Pandas series.
-    :return: Filled pandas series.
-    """
-    unique_values = ds.loc[pd.notna].unique()
-    fillna_values = np.resize(unique_values, ds.isna().sum())
-    return ds.fillna(pd.Series(fillna_values))
+def split_df_by_columns(df):
+    """Split each column into a separate DataFrame."""
+    return {column: df[[column]] for column in df}
 
 
-def concat_waves(
-        df: pd.DataFrame
-) -> pd.DataFrame:
-    """
-    Constructs a unified dataframe from dataset dataframe.
+def group_dfs_by_new_names(df, column_names_new):
+    """Group DataFrames by new column names based on patterns."""
+    dfs_grouped = {column_name: [] for column_name in column_names_new}
+    column_dfs = split_df_by_columns(df)
 
-    :param df: Not unified dataset dataframe.
-    :return: Unified dataset dataframe.
-    """
-    # New columns names dataframe
-    columns_names = get_new_columns_names(df.columns)
+    for column_name, column_df in column_dfs.items():
+        for col_new in column_names_new:
+            pattern = re.compile(r'\d' + col_new + '$')
+            if bool(pattern.search(column_name)):
+                column_df = column_df.rename(columns={column_df.columns[0]: col_new})
+                dfs_grouped[col_new].append(column_df)
+            elif column_name == col_new:
+                dfs_grouped[col_new].append(column_df)
 
-    concat_dc: dict = {}
-    # Iterate over each column in the DataFrame
-    grouped_columns_by_names = columns_names.groupby("new_column_name")
-    for new_column_name, old_column_name_list in grouped_columns_by_names:
-        concat_dc[new_column_name] = pd.concat(
-            map(
-                lambda column_name: df[column_name].rename(
-                    new_column_name),
-                old_column_name_list["old_column_name"]
-            ), ignore_index=True, axis=0)
-        if old_column_name_list.shape[0] == 1:
-            concat_dc[new_column_name] = fill_ds(concat_dc[new_column_name])
+    return dfs_grouped
 
-    return pd.concat(
-        map(lambda key: concat_dc[key], concat_dc),
-        axis=1
-    )
+
+def concatenate_grouped_dfs(dfs_grouped):
+    """Concatenate DataFrames within each group."""
+    return {column_name: pd.concat(df_list, ignore_index=True, axis=0) if df_list else pd.DataFrame()
+            for column_name, df_list in dfs_grouped.items()}
+
+
+def fill_missing_values(final_df, dfs_grouped):
+    """Fill missing values in the DataFrame, with a condition."""
+    for col_new, df_list in dfs_grouped.items():
+        if len(df_list) == 1:
+            unique_values = final_df.loc[final_df[col_new].notna(), col_new].unique()
+            nan_count = final_df[col_new].isna().sum()
+            sequence_to_fill = np.resize(unique_values, nan_count)
+            final_df.loc[final_df[col_new].isna(), col_new] = sequence_to_fill
+
+
+def concat_waves(df):
+    """Main function to orchestrate the refactoring process."""
+    column_names_new = extract_column_names(df)
+    dfs_grouped = group_dfs_by_new_names(df, column_names_new)
+    concat_dfs = concatenate_grouped_dfs(dfs_grouped)
+    final_df = pd.concat(concat_dfs.values(), axis=1)
+    fill_missing_values(final_df, dfs_grouped)
+    return final_df
