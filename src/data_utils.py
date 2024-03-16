@@ -126,21 +126,10 @@ def concatenate_grouped_dfs(dfs_grouped):
             for column_name, df_list in dfs_grouped.items()}
 
 
-def fill_missing_values(final_df, dfs_grouped):
-    """Fill missing values in the DataFrame, with a condition."""
-    for col_new, df_list in dfs_grouped.items():
-        if len(df_list) == 1:
-            unique_values = final_df.loc[final_df[col_new].notna(), col_new].unique()
-            nan_count = final_df[col_new].isna().sum()
-            sequence_to_fill = np.resize(unique_values, nan_count)
-            final_df.loc[final_df[col_new].isna(), col_new] = sequence_to_fill
-
-
 def concat_waves(df):
     """Main function to orchestrate the refactoring process."""
     column_names_new = extract_column_names(df)
     dfs_grouped = group_dfs_by_new_names(df, column_names_new)
     concat_dfs = concatenate_grouped_dfs(dfs_grouped)
     final_df = pd.concat(concat_dfs.values(), axis=1)
-    fill_missing_values(final_df, dfs_grouped)
     return final_df
