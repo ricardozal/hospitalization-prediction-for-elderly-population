@@ -1,0 +1,550 @@
+{
+    "agey": {
+        "description": "Age (years)",
+        "is_categorical": false
+    },
+    "bmi": {
+        "description": "Body Mass Index=kg/m2",
+        "is_categorical": false
+    },
+    "breath_m": {
+        "description": "Difficulty breathing or coughing",
+        "values": [
+            {
+                "yes": 1
+            },
+            {
+                "no": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "cagem": {
+        "description": "Cage missings",
+        "is_categorical": false
+    },
+    "cancre": {
+        "description": "Ever had cancer",
+        "values": [
+            {
+                "yes": 1
+            },
+            {
+                "no": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "cesd_m": {
+        "description": "CESD Modified Score",
+        "is_categorical": false
+    },
+    "decsib": {
+        "description": "Number of deceased siblings",
+        "is_categorical": false
+    },
+    "dentim1y": {
+        "description": "Number of Dental visits, previous 12 months",
+        "is_categorical": false
+    },
+    "diabe": {
+        "description": "Ever had diabetes",
+        "values": [
+            {
+                "yes": 1
+            },
+            {
+                "no": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "dlrc8": {
+        "description": "Cognition Flag S Delayed Word Recall",
+        "is_categorical": false
+    },
+    "doctor1y": {
+        "description": "Doctor visits, previous 12 months",
+        "values": [
+            {
+                "Yes": 1
+            },
+            {
+                "No": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "drink": {
+        "description": "Ever drinks any alcohol",
+        "values": [
+            {
+                "yes": 1
+            },
+            {
+                "no": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "fall": {
+        "description": "Fallen down last 2 years",
+        "values": [
+            {
+                "yes": 1
+            },
+            {
+                "no": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "fallinj": {
+        "description": "Injured from fall",
+        "values": [
+            {
+                "yes": 1
+            },
+            {
+                "no": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "fallnum": {
+        "description": "Number of falls",
+        "is_categorical": false
+    },
+    "fatigue": {
+        "description": "Severe fatigue",
+        "values": [
+            {
+                "yes": 1
+            },
+            {
+                "no": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "ftired": {
+        "description": "CESD-Felt tired",
+        "values": [
+            {
+                "Yes": 1
+            },
+            {
+                "No": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "glasses": {
+        "description": "Wears glasses",
+        "values": [
+            {
+                "yes": 1
+            },
+            {
+                "no": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "hearaid": {
+        "description": "Wears hearing aid",
+        "values": [
+            {
+                "yes": 1
+            },
+            {
+                "no": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "hearing": {
+        "description": "Self-rated hearing",
+        "values": [
+            {
+                "Very good": 2
+            },
+            {
+                "Legally Deaf": 6
+            },
+            {
+                "Poor": 5
+            },
+            {
+                "Good": 3
+            },
+            {
+                "Excellent": 1
+            },
+            {
+                "Fair": 4
+            }
+        ],
+        "is_categorical": true
+    },
+    "height": {
+        "description": "Height in meters",
+        "is_categorical": false
+    },
+    "henum": {
+        "description": "Number of health insurance plans",
+        "is_categorical": false
+    },
+    "hltc": {
+        "description": "Self-report of health change",
+        "values": [
+            {
+                "Somewhat worse": 4
+            },
+            {
+                "Much better": 1
+            },
+            {
+                "Somewhat better": 2
+            },
+            {
+                "More or less the same": 3
+            },
+            {
+                "Much worse": 5
+            }
+        ],
+        "is_categorical": true
+    },
+    "hrtatte": {
+        "description": "Ever had heart attack",
+        "values": [
+            {
+                "yes": 1
+            },
+            {
+                "no": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "imrc8": {
+        "description": "Cognition Flag S Immediate Word Recall (Respondents were asked to listen to a list of eight words and repeat as many as they could remember Respondents are given three consecutive trials and the number of recalled words is recorded. This is the mean of the score from all three trials)",
+        "is_categorical": false
+    },
+    "joga": {
+        "description": "Some difficulty-Run/Jogging one km",
+        "values": [
+            {
+                "Yes": 1
+            },
+            {
+                "No": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "livsib": {
+        "description": "Number of living siblings",
+        "is_categorical": false
+    },
+    "mrct": {
+        "description": "Number of Marriages",
+        "is_categorical": false
+    },
+    "mstat": {
+        "description": "Marital Status",
+        "values": [
+            {
+                "Never married": 8
+            },
+            {
+                "Widowed": 7
+            },
+            {
+                "Partnered": 3
+            },
+            {
+                "Divorced": 5
+            },
+            {
+                "Separated": 4
+            },
+            {
+                "Married": 1
+            }
+        ],
+        "is_categorical": true
+    },
+    "mstath": {
+        "description": "Marital Status w/o Partnership Filled",
+        "values": [
+            {
+                "Never married": 8
+            },
+            {
+                "Widowed": 7
+            },
+            {
+                "Partnered": 3
+            },
+            {
+                "Divorced": 5
+            },
+            {
+                "Separated": 4
+            },
+            {
+                "Married": 1
+            }
+        ],
+        "is_categorical": true
+    },
+    "nagi10": {
+        "description": "Some difficulty-NAGI Score 0-10",
+        "is_categorical": false
+    },
+    "outpt1y": {
+        "description": "Outpatient surgery, previous 12 months",
+        "values": [
+            {
+                "Yes": 1
+            },
+            {
+                "No": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "painlv": {
+        "description": "Usual level of pain",
+        "values": [
+            {
+                "No pain": 0
+            },
+            {
+                "Moderate": 2
+            },
+            {
+                "Mild": 1
+            },
+            {
+                "Severe": 3
+            }
+        ],
+        "is_categorical": true
+    },
+    "push": {
+        "description": "Difficulty-Push/pulling large objects",
+        "values": [
+            {
+                "Yes": 1
+            },
+            {
+                "No": 0
+            },
+            {
+                "Don't Do": 9
+            },
+            {
+                "Can't Do": 2
+            }
+        ],
+        "is_categorical": true
+    },
+    "respe": {
+        "description": "Ever had respiratory disease, incl asthma",
+        "values": [
+            {
+                "yes": 1
+            },
+            {
+                "no": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "rxarthr": {
+        "description": "Whether S takes medication for arthritis",
+        "values": [
+            {
+                "yes": 1
+            },
+            {
+                "no": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "rxdiabi": {
+        "description": "Takes insulin for diabetes",
+        "values": [
+            {
+                "yes": 1
+            },
+            {
+                "no": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "rxhibp": {
+        "description": "Takes meds for high blood pressure",
+        "values": [
+            {
+                "yes": 1
+            },
+            {
+                "no": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "rxhrtat": {
+        "description": "Takes meds for heart attack",
+        "values": [
+            {
+                "yes": 1
+            },
+            {
+                "no": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "rxresp": {
+        "description": "Takes meds for respiratory disease",
+        "values": [
+            {
+                "yes": 1
+            },
+            {
+                "no": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "shlt": {
+        "description": "Self-report of health",
+        "values": [
+            {
+                "Very good": 2
+            },
+            {
+                "Poor": 5
+            },
+            {
+                "Good": 3
+            },
+            {
+                "Excellent": 1
+            },
+            {
+                "Fair": 4
+            }
+        ],
+        "is_categorical": true
+    },
+    "shop": {
+        "description": "Difficulty-Shopping for groceries",
+        "values": [
+            {
+                "Yes": 1
+            },
+            {
+                "No": 0
+            },
+            {
+                "Don't Do": 9
+            },
+            {
+                "Can't Do": 2
+            }
+        ],
+        "is_categorical": true
+    },
+    "sight": {
+        "description": "Self-rated eyesight",
+        "values": [
+            {
+                "Very good": 2
+            },
+            {
+                "Poor": 5
+            },
+            {
+                "Good": 3
+            },
+            {
+                "Excellent": 1
+            },
+            {
+                "Legally Blind": 6
+            },
+            {
+                "Fair": 4
+            }
+        ],
+        "is_categorical": true
+    },
+    "sleepr": {
+        "description": "CESD-Sleep was restless",
+        "values": [
+            {
+                "Yes": 1
+            },
+            {
+                "No": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "smokev": {
+        "description": "Ever smoked",
+        "values": [
+            {
+                "Yes": 1
+            },
+            {
+                "No": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "swell": {
+        "description": "Persistent swelling in feet/ankles",
+        "values": [
+            {
+                "yes": 1
+            },
+            {
+                "no": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "tr16": {
+        "description": "Cognition Flag S Word Recall Summary",
+        "is_categorical": false
+    },
+    "vigact": {
+        "description": "Has participated in hard physical work on average during the last two years, three or more times a week",
+        "values": [
+            {
+                "Yes": 1
+            },
+            {
+                "No": 0
+            }
+        ],
+        "is_categorical": true
+    },
+    "vscan": {
+        "description": "Cognition Flag S Visual Scanning",
+        "is_categorical": false
+    },
+    "weight": {
+        "description": "Measured Weight in kilograms",
+        "is_categorical": false
+    }
+}
