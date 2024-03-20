@@ -1,3 +1,5 @@
+import json
+import os
 
 UNNECESARY_SECTION_COLUMNS = [
     "Person Specific Identifier", "Household Identifier",
@@ -29,3 +31,21 @@ UNNECESARY_SECTION_COLUMNS = [
     "Hand Grip Measure Incomplete", "Beneficiaries Will",
     "Covered Life Insurance", "Has a Will", "Cantril Ladder"
 ]
+
+USED_VARIABLES = [
+    'hltc', 'agey', 'height', 'decsib', 'henum', 'doctor1y', 'bmi', 'weight', 'cagem', 'outpt1y', 'fallinj',
+    'mstat', 'livsib', 'shlt', 'imrc8', 'sight', 'mrct', 'drink', 'hearing', 'vscan', 'smokev', 'rxdiabi',
+    'tr16', 'swell', 'hrtatte', 'fallnum', 'mstath', 'dentim1y', 'rxhibp', 'respe', 'rxarthr', 'painlv',
+    'cancre', 'ftired', 'glasses', 'diabe', 'joga', 'shop', 'fatigue', 'vigact', 'rxhrtat', 'cesd_m', 'dlrc8',
+    'fall', 'rxresp', 'push', 'nagi10', 'hearaid', 'breath_m', 'sleepr'
+]
+
+with open(
+    os.path.join(
+        os.path.abspath(os.path.dirname(__file__)), "model_variables.json")
+) as model_variables_file:
+    JSON_MODEL_VARIABLES = json.load(model_variables_file)
+    MODEL_VARIABLES = {
+        variable: JSON_MODEL_VARIABLES[variable]
+        for variable in USED_VARIABLES
+    }

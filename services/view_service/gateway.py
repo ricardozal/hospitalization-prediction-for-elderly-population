@@ -5,7 +5,6 @@ import redis
 import common.settings as settings
 import pandas as pd
 
-
 db = redis.StrictRedis(host=settings.REDIS_IP, port=settings.REDIS_PORT, db=settings.REDIS_DB_ID)
 
 
@@ -33,4 +32,4 @@ def predict_hospitalization(data):
 
 
 def predict_hospitalization_bunch(data):
-    ...
+    pass
