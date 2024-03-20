@@ -3,7 +3,6 @@ from typing import List
 
 import gdown
 import pandas as pd
-import numpy as np
 import re
 
 from src import config
@@ -127,7 +126,7 @@ def concatenate_grouped_dfs(dfs_grouped):
 
 
 def concat_waves(df):
-    """Main function to orchestrate the refactoring process."""
+    """Main function to orchestrate the dataframe transformation process."""
     column_names_new = extract_column_names(df)
     dfs_grouped = group_dfs_by_new_names(df, column_names_new)
     concat_dfs = concatenate_grouped_dfs(dfs_grouped)

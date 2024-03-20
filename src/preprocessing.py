@@ -1,24 +1,39 @@
-from typing import List, Tuple, Dict
+from sklearn.pipeline import Pipeline
 import pandas as pd
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import MinMaxScaler
+import joblib
+import os
 
-def preprocess_dataframe(df : pd.DataFrame) -> pd.DataFrame:
-    df.columns = df.columns.astype(str)
+pipeline_path = 'preprocessing_pipeline.pkl'
 
-    # Applying SimpleImputer
-    median_imputer = SimpleImputer(strategy='median')
-    median_imputer.fit(df)
 
-    # Transform the data
-    df = pd.DataFrame(median_imputer.transform(df), columns=df.columns)
+def preprocess_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    df = df[sorted(df.columns)]
+    pipeline = get_transform_pipeline()
 
-    scaler = MinMaxScaler()
-    scaler.fit(df)
+    transformed_df = pd.DataFrame(pipeline.transform(df), columns=df.columns)
 
-    df_scaled = scaler.transform(df)
-    working_train_df = pd.DataFrame(df_scaled, columns=df.columns)
+    return transformed_df
 
-    train = working_train_df
 
-    return train
+def get_transform_pipeline(df: pd.DataFrame = None) -> Pipeline:
+    if os.path.exists(pipeline_path):
+        pipeline = joblib.load(pipeline_path)
+    elif df is not None:
+        df = df[sorted(df.columns)]
+
+        pipeline_steps = [
+            ('imputer', SimpleImputer(strategy='median')),
+            ('scaler', MinMaxScaler())
+        ]
+
+        pipeline = Pipeline(steps=pipeline_steps)
+
+        pipeline.fit(df)
+
+        joblib.dump(pipeline, pipeline_path)
+    else:
+        raise Exception("Not be able to get the preprocessing pipeline, fit the pipeline")
+
+    return pipeline
