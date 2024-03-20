@@ -48,7 +48,7 @@ print(f"Rows after removing all rows where the variable 'TARGET' is equal to nul
 print(f"Rows: {h_mhas_c2.shape[0]}")
 
 # Remove other useless features
-h_mhas_c2.drop(columns=[constants.USELESS_FEATURES], inplace=True)
+h_mhas_c2.drop(constants.USELESS_FEATURES, inplace=True, axis=1)
 
 # Remove columns where the percentage of null values is higher than 30%
 # Calculate the percentage of missing values for each column
