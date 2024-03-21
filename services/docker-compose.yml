@@ -22,6 +22,5 @@ services:
     build:
       context: .
       dockerfile: model_service/Dockerfile
-    restart: always
     depends_on:
       - redis

@@ -1,5 +1,4 @@
 import streamlit as st
-import numpy as np
 import pandas as pd
 from uuid import uuid4
 from gateway import predict_hospitalization, predict_hospitalization_bunch
@@ -43,9 +42,11 @@ if __name__ == "__main__":
         submitted = st.form_submit_button("Submit")
         if submitted:
             # Predict the hospitalization
-            prediction = predict_hospitalization(data)
+            data["id"] = str(uuid4())
+            prediction, score = predict_hospitalization(data)
 
             if prediction:
                 st.write("Based on the provided data, there's a higher risk of hospitalization.")
+                st.write(f"Probability: {score * 100}%")
             else:
                 st.write("Based on the provided data, there's a lower risk of hospitalization.")

@@ -8,16 +8,15 @@ import os
 pipeline_path = 'preprocessing_pipeline.pkl'
 
 
-def preprocess_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+def preprocess_dataframe(df: pd.DataFrame, pipeline) -> pd.DataFrame:
     df = df[sorted(df.columns)]
-    pipeline = get_transform_pipeline()
 
     transformed_df = pd.DataFrame(pipeline.transform(df), columns=df.columns)
 
     return transformed_df
 
 
-def get_transform_pipeline(df: pd.DataFrame = None) -> Pipeline:
+def get_transform_pipeline(df: pd.DataFrame = None, save = False) -> Pipeline:
     if os.path.exists(pipeline_path):
         pipeline = joblib.load(pipeline_path)
     elif df is not None:
@@ -32,7 +31,8 @@ def get_transform_pipeline(df: pd.DataFrame = None) -> Pipeline:
 
         pipeline.fit(df)
 
-        joblib.dump(pipeline, pipeline_path)
+        if save:
+            joblib.dump(pipeline, pipeline_path)
     else:
         raise Exception("Not be able to get the preprocessing pipeline, fit the pipeline")
 

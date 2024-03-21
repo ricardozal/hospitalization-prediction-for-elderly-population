@@ -92,17 +92,17 @@ df_train = data_utils.get_datatrain()
 """
 
 # Separate target feature
-X_train = df_train.drop(columns="TARGET", axis=1)
-y_train = df_train["TARGET"]
+X_df = df_train.drop(columns="TARGET", axis=1)
+y_df = df_train["TARGET"]
 
 # Split dataset
-X_train, X_test, y_train, y_test = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X_df, y_df, test_size=0.2, random_state=42)
 
 # 3.2 Applying SimpleImputer and Scale data using pipeline
-preprocessing.get_transform_pipeline(X_train)
+pipeline = preprocessing.get_transform_pipeline(X_train)
 
-X_train = preprocessing.preprocess_dataframe(X_train)
-X_test = preprocessing.preprocess_dataframe(X_test)
+X_train = preprocessing.preprocess_dataframe(X_train, pipeline)
+X_test = preprocessing.preprocess_dataframe(X_test, pipeline)
 
 # Apply SMOTE to address a class imbalance (1 variable) in a dataset
 sm = SMOTE(sampling_strategy='minority', random_state=42)
@@ -157,6 +157,24 @@ top50_features = X_train.columns[sorted_idx][:-number_of_used_features-1:-1]
 print("--- top 50 most important features from trained LGBM ---")
 print(top50_features.tolist())
 
+
+with open('top50_features.txt', 'w') as file:
+    for item in top50_features.tolist():
+        file.write(f"{item}\n")
+
+# Split dataset
+X_train, X_test, y_train, y_test = train_test_split(X_df[top50_features.tolist()], y_df, test_size=0.2, random_state=42)
+
+# 3.2 Applying SimpleImputer and Scale data using pipeline
+pipeline = preprocessing.get_transform_pipeline(X_train, True)
+
+X_train = preprocessing.preprocess_dataframe(X_train, pipeline)
+X_test = preprocessing.preprocess_dataframe(X_test, pipeline)
+
+# fit predictor and target variable
+X_train, y_train = sm.fit_resample(X_train, y_train)
+
+
 param_dist = {
     "max_depth": [3, 5, None],
     "max_features": [0.2, 0.6, 1.0],
@@ -171,13 +189,13 @@ roc_auc_scorer = make_scorer(roc_auc_score)
 
 rf = RandomForestClassifier()
 model = RandomizedSearchCV(rf, param_distributions=param_dist, cv=5, scoring=roc_auc_scorer, verbose=2, n_jobs=-1)
-model.fit(X_train[top50_features.tolist()], y_train)
+model.fit(X_train, y_train)
 
 # Train data predictions (class 1)
-rf_pred_train = model.predict_proba(X_train[top50_features.tolist()])[:, 1]
+rf_pred_train = model.predict_proba(X_train)[:, 1]
 
 # Validation data predictions (class 1)
-rf_pred_val = model.predict_proba(X_test[top50_features.tolist()])[:, 1]
+rf_pred_val = model.predict_proba(X_test)[:, 1]
 
 # Train ROC AUC Score
 roc_auc_train = roc_auc_score(y_true=y_train, y_score=rf_pred_train)
@@ -187,7 +205,7 @@ print(f"Train ROC AUC Score for Random Forest: {roc_auc_train:.4f}")
 roc_auc_val = roc_auc_score(y_true=y_test, y_score=rf_pred_val)
 print(f"Validation ROC AUC Score for Random Forest: {roc_auc_val:.4f}")
 
-y_pred = model.predict(X_test[top50_features.tolist()])
+y_pred = model.predict(X_test)
 
 print("--- CLASSIFICATION REPORT FOR RANDOM FOREST MODEL ---")
 print(classification_report(y_test, y_pred))

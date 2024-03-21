@@ -15,18 +15,18 @@ def encode_data(data: dict):
 
 
 def decode_data(data: dict):
-    decoded_data = {}
+    decoded_data_dict = {}
     for key, value in data.items():
         if value is None:
-            decoded_data[key] = None
+            decoded_data_dict[key] = None
         else:
             if MODEL_VARIABLES[key]["is_categorical"]:
-                decoded_data[key] = [k for k, v in MODEL_VARIABLES[key]["values"].items()
+                decoded_data_dict[key] = [k for k, v in MODEL_VARIABLES[key]["values"].items()
                                      if v == value]
-                if len(decode_data[key]) == 1:
-                    decoded_data[key] = decode_data[key][0]
+                if len(decoded_data_dict[key]) == 1:
+                    decoded_data_dict[key] = decoded_data_dict[key][0]
                 else:
-                    decoded_data[key] = None
+                    decoded_data_dict[key] = None
             else:
-                decoded_data[key] = data[key]
-    return decoded_data
+                decoded_data_dict[key] = data[key]
+    return decoded_data_dict
