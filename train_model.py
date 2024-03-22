@@ -187,7 +187,7 @@ param_dist = {
 
 roc_auc_scorer = make_scorer(roc_auc_score)
 
-rf = RandomForestClassifier()
+rf = RandomForestClassifier(random_state=42)
 model = RandomizedSearchCV(rf, param_distributions=param_dist, cv=5, scoring=roc_auc_scorer, verbose=2, n_jobs=-1)
 model.fit(X_train, y_train)
 
