@@ -1,10 +1,6 @@
-import numpy as np
-import pandas as pd
-from src import (
+from model_engineering.src import (
     constants,
-    data_utils,
-    data_eda,
-    preprocessing
+    data_utils
 )
 
 

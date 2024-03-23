@@ -2,3 +2,4 @@ streamlit
 pandas
 numpy
 redis==4.1.4
+openpyxl
