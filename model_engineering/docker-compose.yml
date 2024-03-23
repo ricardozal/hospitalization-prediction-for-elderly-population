@@ -1,0 +1,8 @@
+version: "3.2"
+services:
+  model_training:
+    build: .
+    volumes:
+      - ../services/common/features:/usr/src/app/features
+      - ../services/model_service/trained_model:/usr/src/app/trained_model
+      - ./dataset:/usr/src/app/dataset

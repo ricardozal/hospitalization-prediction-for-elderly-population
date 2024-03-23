@@ -158,7 +158,7 @@ print("--- top 50 most important features from trained LGBM ---")
 print(top50_features.tolist())
 
 
-with open('top50_features.txt', 'w') as file:
+with open('features/top50_features.txt', 'w') as file:
     for item in top50_features.tolist():
         file.write(f"{item}\n")
 
@@ -216,4 +216,4 @@ print("--- CONFUSION MATRIX FOR RANDOM FOREST MODEL ---")
 print(cm)
 
 # Save the model to a file
-joblib.dump(model, constants.FINAL_MODEL)
+joblib.dump(model, f"trained_model/{constants.FINAL_MODEL}")
