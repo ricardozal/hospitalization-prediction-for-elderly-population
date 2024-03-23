@@ -44,9 +44,12 @@ if __name__ == "__main__":
             # Predict the hospitalization
             data["id"] = str(uuid4())
             prediction, score = predict_hospitalization(data)
+            score = float(score) * 100
 
             if prediction:
                 st.write("Based on the provided data, there's a higher risk of hospitalization.")
-                st.write(f"Probability: {score * 100}%")
+                st.write(f"Probability: {score:.3f}%")
             else:
+                score = 100 - score
                 st.write("Based on the provided data, there's a lower risk of hospitalization.")
+                st.write(f"Probability: {score:.3f}%")

@@ -1,4 +1,14 @@
 from .settings import MODEL_VARIABLES
+import re
+import numpy as np
+
+
+def get_description_value(key, value):
+    try:
+        return MODEL_VARIABLES[key]["values"][
+            re.sub(r'^\d+.','', value)]
+    except:
+        return value
 
 
 def encode_data(data: dict):
@@ -8,9 +18,18 @@ def encode_data(data: dict):
             encoded_data[key] = None
         else:
             if MODEL_VARIABLES[key]["is_categorical"]:
-                encoded_data[key] = MODEL_VARIABLES[key]["values"][value]
+                if isinstance(value, dict):
+                    encoded_data[key] = [
+                        get_description_value(key, v)
+                        for v in value.values()
+                    ]
+                else:
+                    encoded_data[key] = get_description_value(key, value)
             else:
-                encoded_data[key] = value
+                if isinstance(value, dict):
+                    encoded_data[key] = list(value.values())
+                else:
+                    encoded_data[key] = value
     return encoded_data
 
 
