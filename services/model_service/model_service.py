@@ -11,7 +11,7 @@ from common.utils import encode_data
 
 db = redis.StrictRedis(host=settings.REDIS_IP, port=settings.REDIS_PORT, db=settings.REDIS_DB_ID)
 
-model = joblib.load(f"trained_model/final_model.pkl")
+model = joblib.load("trained_model/final_model.pkl")
 preprocessing_pipeline = joblib.load('trained_model/preprocessing_pipeline.pkl')
 
 

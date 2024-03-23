@@ -23,7 +23,7 @@ with open(os.path.join(
 
 with open(
     os.path.join(
-        os.path.abspath(os.path.dirname(__file__)), "model_variables.json")
+        os.path.abspath(os.path.dirname(__file__)), "model_variables.json"), 'r'
 ) as model_variables_file:
     JSON_MODEL_VARIABLES = json.load(model_variables_file)
     MODEL_VARIABLES = {
