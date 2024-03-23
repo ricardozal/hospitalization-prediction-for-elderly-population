@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-from uuid import uuid4
 from gateway import predict_hospitalization, predict_hospitalization_bunch
 from common.settings import MODEL_VARIABLES
 
@@ -27,9 +26,8 @@ if __name__ == "__main__":
         data_df = process_uploaded_file(uploaded_file)
         if data_df is not None:
             predictions = predict_hospitalization_bunch(data_df)
-            data_df['Will be hospitalized'] = predictions
             st.write("Prediction Results:")
-            st.dataframe(data_df)
+            st.dataframe(predictions)
     else:
         with st.form("health_data_form"):
             st.write("Please enter the following health information:")
@@ -52,8 +50,8 @@ if __name__ == "__main__":
             submitted = st.form_submit_button("Submit")
             if submitted:
                 # Predict the hospitalization
-                data["id"] = str(uuid4())
-                prediction, score = predict_hospitalization(data)
+                to_predict = pd.DataFrame([data], index=['row1'])
+                prediction, score = predict_hospitalization(to_predict)
                 score = float(score) * 100
 
                 if prediction:
