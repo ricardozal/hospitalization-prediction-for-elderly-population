@@ -5,7 +5,7 @@ from sklearn.preprocessing import MinMaxScaler
 import joblib
 import os
 
-pipeline_path = 'preprocessing_pipeline.pkl'
+pipeline_path = './trained_model/preprocessing_pipeline.pkl'
 
 
 def preprocess_dataframe(df: pd.DataFrame, pipeline) -> pd.DataFrame:

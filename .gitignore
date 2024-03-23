@@ -4,5 +4,6 @@ dataset/
 testenv/
 helth-project/
 .idea/
-services/common/top50_features.txt
+services/common/features/top50_features.txt
 services/model_service/trained_model/
+model_engineering/dataset/

@@ -18,7 +18,7 @@ API_SLEEP = 0.05
 SERVER_SLEEP = 0.05
 
 with open(os.path.join(
-        os.path.abspath(os.path.dirname(__file__)), "top50_features.txt"), 'r') as file:
+        os.path.abspath(os.path.dirname(__file__)), "features/top50_features.txt"), 'r') as file:
     USED_VARIABLES = [line.strip() for line in file]
 
 with open(
