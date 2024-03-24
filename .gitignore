@@ -4,3 +4,5 @@ dataset/
 testenv/
 helth-project/
 .idea/
+preprocessing_pipeline.pkl
+random_forest_model.pkl
