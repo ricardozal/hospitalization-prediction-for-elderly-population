@@ -1,25 +1,32 @@
 import json
 import time
 
-import numpy as np
 import redis
 from common import settings
-import random
+import joblib
+
+import pandas as pd
+
+from common.utils import encode_data
 
 db = redis.StrictRedis(host=settings.REDIS_IP, port=settings.REDIS_PORT, db=settings.REDIS_DB_ID)
 
-model = ...
+model = joblib.load("trained_model/final_model.pkl")
+preprocessing_pipeline = joblib.load('trained_model/preprocessing_pipeline.pkl')
 
 
 def predict(data):
 
-    print(data)
+    data = encode_data(data)
 
-    prediction = np.random.choice([True, False], size=len(data)).tolist()
-    pred_probability = random.random()
+    df = pd.DataFrame(data, index=[0])
+    df = df[sorted(df.columns)]
+    df = pd.DataFrame(preprocessing_pipeline.transform(df), columns=df.columns)
+
+    prediction = model.predict(df)
+    pred_probability = model.predict_proba(df)[:, 1]
 
     return prediction, pred_probability
-
 
 
 def handle_queue_messages():
@@ -32,10 +39,10 @@ def handle_queue_messages():
         class_name, pred_probability = predict(data)
 
         result = {
-                "prediction": class_name,
-                "score": str(pred_probability),
+                "prediction": class_name.tolist()[0],
+                "score": str(pred_probability[0]),
             }
-        
+
         db.set(id, json.dumps(result))
 
         time.sleep(settings.SERVER_SLEEP)

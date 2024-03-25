@@ -6,3 +6,6 @@ helth-project/
 .idea/
 preprocessing_pipeline.pkl
 random_forest_model.pkl
+services/common/features/top50_features.txt
+services/model_service/trained_model/
+model_engineering/dataset/
